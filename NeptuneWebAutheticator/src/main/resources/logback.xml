@@ -1,0 +1,50 @@
+<configuration>
+
+    <!-- Impostazione del pattern di logging -->
+    <property name="PATTERN" value="%d{dd/MM/yyyy HH:mm:ss.SSS} %-5level %logger{36} - %msg%n" />
+
+    <!-- Definizione dell'appender per la console -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Appender per il file di log con rolling policy -->
+    <appender name="DAILY_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>log/debug.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>log/debug.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>1GB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>${PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Logger per il pacchetto specifico -->
+    <logger name="zcs.automation" level="DEBUG">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="DAILY_FILE" />
+    </logger>
+
+    <!-- Logger per errori -->
+    <logger name="zcs.automation" level="ERROR">
+        <appender-ref ref="ERROR_FILE" />
+    </logger>
+
+    <!-- Configurazione root -->
+    <root level="DEBUG">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="DAILY_FILE" />
+    </root>
+
+    <!-- Logger specifico per Spring -->
+    <logger name="org.springframework" level="DEBUG" />
+
+</configuration>
