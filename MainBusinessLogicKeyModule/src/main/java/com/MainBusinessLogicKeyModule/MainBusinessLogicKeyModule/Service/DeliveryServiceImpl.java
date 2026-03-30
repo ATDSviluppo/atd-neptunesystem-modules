@@ -167,7 +167,7 @@ public class DeliveryServiceImpl implements CommonService {
                         socketResponse.sendUserChoiceToSocket(userChoiceDTO, objectMapper);
                     }
                     default -> {
-                        log.error("Ruolo utente non supportato: " + employee.getEmployeeRole());
+                        socketResponse.sendOperationResponse("Failed", "Ruolo utente non supportato: " + employee.getEmployeeRole(), objectMapper);
                         return null;
                     }
                 }
