@@ -9,7 +9,11 @@ import org.springframework.stereotype.Service;
 public interface AuthenticationService {
     boolean isUserAuthenticate(HttpServletRequest request);
 
+    ResponseEntity<String> getUserRole(HttpServletRequest request);
+
     Tenant getUserAuthenticated(HttpServletRequest request);
 
     ResponseEntity<String> login(HttpServletRequest request,String username, String password);
+
+    ResponseEntity<String> logout(HttpServletRequest request);
 }

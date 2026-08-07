@@ -27,9 +27,42 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     @Transactional
     @SuppressWarnings("unchecked")
-    public void addDevice(Object payloadList) {
-        if (payloadList instanceof List) {
+    public ResponseEntity<String> addDevice(Object payloadList) {
+        if (payloadList instanceof List && ((List<?>) payloadList).size() == 1) {
+            Map<String, Object> singlePayload = (Map<String, Object>) ((List<?>) payloadList).getFirst();
 
+            Device device = new Device();
+            log.info(singlePayload.toString());
+
+            device.setDeviceId((String) singlePayload.get("DeviceId"));
+            device.setDrumId(singlePayload.get("DrumId") != null ? Integer.valueOf(singlePayload.get("DrumId").toString()) : null);
+            device.setSectorId(singlePayload.get("SectorId") != null ? Integer.valueOf(singlePayload.get("SectorId").toString()) : null);
+            device.setExpirationDate((String) singlePayload.get("ExpirationDate"));
+            device.setNominalNumber(singlePayload.get("NominalNumber") != null ? Integer.valueOf(singlePayload.get("NominalNumber").toString()) : null);
+            device.setHolder(singlePayload.get("Holder") != null ? Boolean.valueOf(singlePayload.get("Holder").toString()) : null);
+            device.setTemporaryOwner((String) singlePayload.get("TemporaryOwner"));
+            device.setEcpCode((String) singlePayload.get("EcpCode"));
+            device.setStatus((String) singlePayload.get("Status"));
+            device.setDeviceBarCode((String) singlePayload.get("DeviceBarCode"));
+            device.setMachineId((String) singlePayload.get("MachineId"));
+            device.setLocation((String) singlePayload.get("Location"));
+            device.setDeviceType((String) singlePayload.get("DeviceTypeId"));
+            device.setDeviceDetail((String) singlePayload.get("DeviceDetailId"));
+
+            Device deviceOptional = deviceRepository.findByEpcCode(device.getEcpCode());
+
+            Optional<Device> deviceExisting = deviceRepository.findById(device.getDeviceId());
+            if (deviceExisting.isPresent()) {
+                log.info("Dispositivo con ID {} già contenuto, non verrà inserito", device.getDeviceId());
+                return ResponseEntity.ok("Dispositivo già contenuto, non verrà inserito");
+            } else if (deviceOptional != null) {
+                return ResponseEntity.status(409).body("Dispositivo con epc già presente, non verrà inserito");
+            } else {
+                deviceRepository.save(device);
+                log.info("Dispositivo con ID {} inserito con successo", device.getDeviceId());
+                return ResponseEntity.ok("Dispositivo inserito con successo");
+            }
+        } else if (payloadList instanceof List && ((List<?>) payloadList).size() > 1) {  //da rivedere in caso di implementazione
             List<Map<String, Object>> payload = (List<Map<String, Object>>) payloadList;
 
             for (Map<String, Object> singlePayload : payload) {
@@ -53,13 +86,19 @@ public class DeviceServiceImpl implements DeviceService {
 
 
                 Optional<Device> deviceExisting = deviceRepository.findById(device.getDeviceId());
-                if (deviceExisting.isPresent()) {
+                Device deviceOptional = deviceRepository.findByEpcCode(device.getEcpCode());
+
+                if (deviceOptional != null) {
+                    return ResponseEntity.status(409).body("Dispositivo con epc già presente, non verrà inserito");
+                } else if (deviceExisting.isPresent()) {
                     log.info("Dispositivo con ID {} già contenuto, non verrà inserito", device.getDeviceId());
+                    return ResponseEntity.status(409).body("Dispositivo già contenuto, non verrà inserito");
                 } else {
                     deviceRepository.save(device);
                     log.info("Dispositivo con ID {} inserito con successo", device.getDeviceId());
                 }
             }
+            return ResponseEntity.ok("Dispositivo inserito con successo");
         } else if (payloadList instanceof Map) {
             Map<String, Object> singlePayload = (Map<String, Object>) payloadList;
             Device device = new Device();
@@ -81,22 +120,30 @@ public class DeviceServiceImpl implements DeviceService {
             device.setDeviceDetail((String) singlePayload.get("DeviceDetailId"));
 
             Optional<Device> deviceExisting = deviceRepository.findById(device.getDeviceId());
-            if (deviceExisting.isPresent()) {
+            Device deviceOptional = deviceRepository.findByEpcCode(device.getEcpCode());
+
+            if (deviceOptional != null) {
+                return ResponseEntity.status(409).body("Dispositivo con epc già presente, non verrà inserito");
+            } else if (deviceExisting.isPresent()) {
                 log.info("Dispositivo con ID {} già contenuto, non verrà inserito", device.getDeviceId());
+                return ResponseEntity.status(409).body("Dispositivo già contenuto, non verrà inserito");
             } else {
                 deviceRepository.save(device);
                 log.info("Dispositivo con ID {} inserito con successo", device.getDeviceId());
+                return ResponseEntity.ok("Dispositivo inserito con successo");
             }
         }
+        return ResponseEntity.status(400).body("payload malformed");
     }
 
     @Override
     @Transactional
     public ResponseEntity<String> updateDevice(Object payloadList) {
         if (payloadList instanceof List) {
+            log.info("Chiamata di update avvenuta da ZCarFleet");
+
             List<Map<String, Object>> payload = (List<Map<String, Object>>) payloadList;
             for (Map<String, Object> singlePayload : payload) {
-
                 String deviceId = singlePayload.get("DeviceId").toString();
                 Optional<Device> existingDevice = deviceRepository.findById(deviceId);
 
@@ -111,9 +158,10 @@ public class DeviceServiceImpl implements DeviceService {
                     deviceRepository.save(device);
                     deviceRepository.flush();
                     log.info("Device updated successfully");
+
                     return ResponseEntity.ok("Aggiornamento avvenuto con successo");
                 } else {
-                    return ResponseEntity.ok("Dispositivo non trovato");
+                    return ResponseEntity.status(404).body("Dispositivo non trovato");
                 }
             }
 
@@ -127,19 +175,18 @@ public class DeviceServiceImpl implements DeviceService {
                 Device device = existingDevice.get();
                 device.setDrumId((Integer) singlePayload.get("DrumId"));
                 device.setSectorId((Integer) singlePayload.get("SectorId"));
-                //device.setEcpCode((String) payload.get("EcpCode"));
+                device.setEcpCode((String) singlePayload.get("EcpCode"));
                 device.setHolder(singlePayload.get("Holder") != null ? Boolean.valueOf(singlePayload.get("Holder").toString()) : null);
                 device.setTemporaryOwner((String) singlePayload.get("TemporaryOwner"));
-
                 deviceRepository.save(device);
                 deviceRepository.flush();
                 log.info("Device updated successfully");
                 return ResponseEntity.ok("Aggiornamento avvenuto con successo");
             } else {
-                return ResponseEntity.ok("Dispositivo non trovato");
+                return ResponseEntity.status(404).body("Dispositivo non trovato");
             }
         }
-        return ResponseEntity.status(500).body("Errore nella formattazione dati");
+        return ResponseEntity.status(400).body("Errore nella formattazione dati");
 
     }
 
@@ -155,7 +202,7 @@ public class DeviceServiceImpl implements DeviceService {
             return ResponseEntity.ok("Dispositivo eliminato con successo");
         } else {
             log.info("Device not found");
-            return ResponseEntity.ok("Dispositivo non trovato");
+            return ResponseEntity.status(404).body("Dispositivo non trovato");
         }
     }
 

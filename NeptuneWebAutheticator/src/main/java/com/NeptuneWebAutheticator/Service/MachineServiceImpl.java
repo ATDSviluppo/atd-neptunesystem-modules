@@ -4,10 +4,14 @@ import com.NeptuneWebAutheticator.DTO.MachineDTO;
 import com.NeptuneWebAutheticator.Entity.Machine;
 import com.NeptuneWebAutheticator.Entity.Tenant;
 import com.NeptuneWebAutheticator.Repository.MachineRepository;
+import com.NeptuneWebAutheticator.Repository.TenantRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -15,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class MachineServiceImpl implements MachineService {
@@ -23,6 +28,14 @@ public class MachineServiceImpl implements MachineService {
 
     @Autowired
     private MachineRepository machineRepository;
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Autowired
+    private TenantRepository tenantRepository;
 
     @Override
     public List<Machine> getMachines() {
@@ -95,6 +108,59 @@ public class MachineServiceImpl implements MachineService {
             if (machineList == null || machineList.isEmpty()) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
             machineRepository.deleteAll(machineList);
             return ResponseEntity.ok("Macchina eliminata con successo");
+        } else {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<String> addTenant(HttpServletRequest request, Map<String, Object> payloadList) {
+        if (authenticationService.isUserAuthenticate(request) && Objects.equals(authenticationService.getUserAuthenticated(request).getRole(), "Administrator")) {
+            String role = (String) payloadList.get("Role");
+            String username = (String) payloadList.get("Username");
+            String password = passwordEncoder().encode((String) payloadList.get("Password"));
+
+            if (role == null || username == null || password == null) {
+                return ResponseEntity.status(400).body("Payload malformed");
+            }
+
+            if (tenantRepository.findByUsername(username) != null) {
+                return ResponseEntity.status(400).body("Username already taken");
+            }
+
+            Tenant tenant = new Tenant();
+            tenant.setRole(role);
+            tenant.setUsername(username);
+            tenant.setPassword(password);
+
+            tenantRepository.save(tenant);
+            return ResponseEntity.ok("Utente aggiunto con successo");
+        } else {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<String> updateTenant(HttpServletRequest request, Map<String, Object> payloadList) {
+        if (authenticationService.isUserAuthenticate(request)) {
+            String username = (String) payloadList.get("Username");
+            String password = passwordEncoder().encode((String) payloadList.get("Password"));
+
+            if (username == null || password == null) {
+                return ResponseEntity.status(400).body("Payload malformed");
+            }
+
+            if (tenantRepository.findByUsername(username) != null) {
+                return ResponseEntity.status(400).body("Username already taken");
+            }
+
+            Tenant tenant = authenticationService.getUserAuthenticated(request);
+            tenant.setUsername(username);
+            tenant.setPassword(password);
+            tenantRepository.save(tenant);
+            return ResponseEntity.ok("Utente aggiornato con successo");
         } else {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }

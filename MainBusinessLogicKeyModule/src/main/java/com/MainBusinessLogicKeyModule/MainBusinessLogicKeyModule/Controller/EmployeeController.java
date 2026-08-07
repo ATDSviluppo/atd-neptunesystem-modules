@@ -17,30 +17,26 @@ public class EmployeeController {
 
     @CrossOrigin(origins = "*")
     @GetMapping("/Employee")
-    public List<Employee> getEmployee()
-    {
+    public List<Employee> getEmployee() {
         return employeeService.getEmployee();
     }
 
     @CrossOrigin(origins = "*")
     @PostMapping("/Employee")
-    public void addEmployee(@RequestBody List<Map<String, Object>> payload)
-    {
-        employeeService.addEmployee(payload);
+    public ResponseEntity<String> addEmployee(@RequestBody List<Map<String, Object>> payload) {
+        return employeeService.addEmployee(payload);
     }
 
     @CrossOrigin(origins = "*")
     @DeleteMapping("/Employee")
-    public void deleteEmployee(@RequestBody Map<String, Object> payload)
-    {
-        employeeService.deleteEmployee(payload);
+    public ResponseEntity<String> deleteEmployee(@RequestBody Map<String, Object> payload) {
+        return employeeService.deleteEmployee(payload);
     }
 
     @CrossOrigin(origins = "*")
     @PutMapping("/Employee")
-    public ResponseEntity<String> updateEmployee(@RequestBody Map<String, Object> payload)
-    {
-       return employeeService.updateEmployee(payload);
+    public ResponseEntity<String> updateEmployee(@RequestBody Map<String, Object> payload) {
+        return employeeService.updateEmployee(payload);
     }
 
 }

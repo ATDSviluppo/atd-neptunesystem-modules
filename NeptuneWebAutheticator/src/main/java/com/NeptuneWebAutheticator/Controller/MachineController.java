@@ -33,4 +33,14 @@ public class MachineController {
     public ResponseEntity<String> deleteMachine(HttpServletRequest request,@RequestBody  Map<String, Object> payload) {
         return machineService.deleteMachine(request, payload);
     }
+
+    @PostMapping("/api/Tenant")
+    public ResponseEntity<String> addTenant(HttpServletRequest userId, @RequestBody Map<String, Object> payload) {
+        return machineService.addTenant(userId, payload);
+    }
+
+    @PutMapping("/api/Tenant")
+    public ResponseEntity<String> updateTenant(HttpServletRequest userId, @RequestBody Map<String, Object> payload) {
+        return machineService.updateTenant(userId, payload);
+    }
 }

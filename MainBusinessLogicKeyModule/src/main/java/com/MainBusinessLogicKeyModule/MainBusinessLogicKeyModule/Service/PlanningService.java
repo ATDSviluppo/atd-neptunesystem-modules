@@ -1,6 +1,7 @@
 package com.MainBusinessLogicKeyModule.MainBusinessLogicKeyModule.Service;
 
 import com.MainBusinessLogicKeyModule.MainBusinessLogicKeyModule.Entity.Planning;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,13 +13,13 @@ public interface PlanningService {
     List<Planning> getPlanning();
 
     @Transactional
-    void addPlanning(List<Map<String, Object>> payload);
+    ResponseEntity<String> addPlanning(List<Map<String, Object>> payload);
 
     @Transactional
-    void updatePlanning(List<Map<String, Object>> payload);
+    ResponseEntity<String> updatePlanning(List<Map<String, Object>> payload);
 
     @Transactional
-    void deletePlanning(List<Map<String, Object>> payload);
+    ResponseEntity<String> deletePlanning(List<Map<String, Object>> payload);
 
     Planning getFirstActivePlanByEmployeeId(String employeeId);
 }

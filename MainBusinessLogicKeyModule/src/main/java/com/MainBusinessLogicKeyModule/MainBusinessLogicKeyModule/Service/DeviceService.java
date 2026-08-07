@@ -12,7 +12,7 @@ import java.util.Map;
 public interface DeviceService {
     List<Device> getDevices();
 
-    void addDevice(Object payload);
+    ResponseEntity<String> addDevice(Object payload);
 
     ResponseEntity<String> updateDevice(Object payload);
 

@@ -10,6 +10,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -17,25 +18,14 @@ import java.util.Map;
 public interface DeliveryService {
     void setDeviceToTurnBack(Device device);
 
-    Device getDeviceToTurnBack();
-
-    UserChoiceDTO analizeUserChoice(Employee employee) throws JsonProcessingException;
-
     @Transactional
-    ResponseEntity<String> analizeUserRetreat(Map<String, Object> payload) throws
-            Exception;
-
-    @Transactional
-    boolean analizeUserTurnBack(String deviceGuid) throws JsonProcessingException, InterruptedException;
-
-    boolean analizeUserCharge(String deviceGuid) throws JsonProcessingException, InterruptedException;
-
+    boolean analizeUserTurnBack(String deviceGuid) throws JsonProcessingException, InterruptedException, IOException;
 
     //ResponseEntity<String> handleDeviceTurnBack(Device device, String employeeCard, ObjectMapper objectMapper) throws InterruptedException, JsonProcessingException;
 
-    List<Employee> getEmployeeForAssistantRetreat();
-
     boolean updateDeviceOn(String deviceId);
+
+    ResponseEntity<String> updatePlanningStatus(List<Map<String, Object>> payload);
 
     boolean updateDeviceOut(String deviceId, String employeeId);
 

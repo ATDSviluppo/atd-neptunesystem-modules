@@ -50,7 +50,7 @@ import static com.AuthenticationModule.Utility.OperationMode.setMode;
 
 @Service
 @Slf4j
-public class DeliveryServiceImpl implements CommonService {
+public class DeliveryServiceImpl implements CommonService, DeliveryService {
     @Autowired
     DeviceRepository deviceRepository;
 
@@ -144,9 +144,7 @@ public class DeliveryServiceImpl implements CommonService {
                         }
                     }
                     case "Assistant" -> {
-                        List<Device> allDevices = commonRepository.findByHolder(true);
                         List<DeviceTypeDTO> enumDeviceTypeList = new ArrayList<>();
-                        List<DeviceDTO> deviceDTOList = new ArrayList<>();
 
                         List<DeviceDTO> deviceList = commonRepository.findByStatusAndHolder()
                                 .stream()
@@ -471,6 +469,10 @@ public class DeliveryServiceImpl implements CommonService {
         }
     }
 
+    private boolean isBlank(String value) {
+        return value == null || value.isBlank();
+    }
+
     @Override
     public boolean updateDeviceOn(String deviceId) {
         try {
@@ -480,6 +482,81 @@ public class DeliveryServiceImpl implements CommonService {
             log.error(e.getMessage());
             return false;
         }
+    }
+
+    /*
+     * metodo di gestione di convalide fatte da portale web/app ZCarfleet
+     */
+    @Override
+    @Transactional
+    public ResponseEntity<String> updatePlanningStatus(List<Map<String, Object>> payloadList) {
+        if (payloadList.size() != 1) {
+            return ResponseEntity.status(400).body("Payload malformed");
+        }
+
+        Map<String, Object> payload = payloadList.getFirst();
+
+        String planningId = payload.get("PlanningID") != null ? (String) payload.get("PlanningID") : null;
+        String deviceId = payload.get("DeviceId") != null ? (String) payload.get("DeviceId") : null;
+        String temporaryOwner = payload.get("TemporaryOwner") != null ? (String) payload.get("TemporaryOwner") : null;
+        Boolean holder = payload.get("Holder") != null
+                ? Boolean.parseBoolean(payload.get("Holder").toString())
+                : null;
+
+        if (isBlank(planningId) || isBlank(deviceId) || holder == null || isBlank(temporaryOwner)) {
+            return ResponseEntity.status(400).body("Payload malformed");
+        }
+
+        List<Planning> planning = planningRepository.findByPlanningId(planningId);
+        Optional<Device> deviceOpt = deviceRepository.findById(deviceId);
+        PlanningRetriedMap planningRetriedMap = planningRetriedMapRepository.findByPlanningId(planningId);
+
+        if (planning.isEmpty() && planningRetriedMap == null) {
+            return ResponseEntity.status(404).body("Planning with id: " + planningId + " not found");
+        }
+
+        if (deviceOpt.isEmpty()) {
+            return ResponseEntity.status(404).body("Device with id: " + deviceId + " not found");
+        }
+
+        Device device = deviceOpt.get();
+
+        // è una convalida riconsegna
+        if (holder) {
+
+            if (!device.getHolder() && Objects.equals(device.getTemporaryOwner(), temporaryOwner)) {
+                // se è ancora in carico all'utente assegnatario della prenotazione lo aggiorno come riconsegnato, altrimenti no
+                updateDeviceOn(deviceId);
+            }
+
+            planningRepository.deleteAllByPlannings(planning);
+            planningRetriedMapRepository.deleteByPlanningId(planningId);
+        } else { // è una convalida ritiro
+            if (!device.getHolder() && !Objects.equals(device.getTemporaryOwner(), temporaryOwner)) {
+                PlanningRetriedMap prm = planningRetriedMapRepository.findByDeviceIdAndEmployeeId(deviceId, device.getTemporaryOwner());
+
+                //se è presente una prenotazione residua provo a chiuderla automaticamente
+                if (prm != null) {
+                    Event event = new Event(new Date(), "TurnBack", device.getDeviceId(), device.getTemporaryOwner(), prm.getPlanningId(), device.getDeviceDetail(), device.getDeviceType(), device.getLocation(), device.getMachineId(), "Convalida chiusa automaticamente dal distributore", true);
+                    eventRepository.save(event);
+                    planningRetriedMapRepository.deleteByPlanningId(prm.getPlanningId());
+                    deletePlanningById(prm.getPlanningId());
+                }
+            } else if (!device.getHolder() && Objects.equals(device.getTemporaryOwner(), temporaryOwner) && planningRetriedMap != null) {
+                return ResponseEntity.ok("Convalida ritiro già avvenuta");
+            }
+
+            PlanningRetriedMap newPlanningRetriedMap = new PlanningRetriedMap(planningId, deviceId, temporaryOwner);
+
+            planningRetriedMapRepository.save(newPlanningRetriedMap);
+            deletePlanningById(planningId);
+            updateDeviceOut(deviceId, temporaryOwner);
+
+            planningRetriedMapRepository.flush();
+            planningRepository.flush();
+        }
+
+        return ResponseEntity.ok("Operation executed successfully");
     }
 
     @Override
@@ -519,7 +596,7 @@ public class DeliveryServiceImpl implements CommonService {
         log.info("ora: " + LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
         log.info("emploee" + employeeId);
 
-        List<Planning> list = planningRepository.findFirstByEmployeeIdAndTodayAndStartPlanAfter(employeeId,LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")), LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
+        List<Planning> list = planningRepository.findFirstByEmployeeIdAndTodayAndStartPlanAfter(employeeId, LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")), LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
         return list.isEmpty() ? null : list.getFirst();
     }
 

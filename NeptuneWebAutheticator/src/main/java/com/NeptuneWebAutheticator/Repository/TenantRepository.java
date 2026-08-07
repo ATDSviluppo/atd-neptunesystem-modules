@@ -10,4 +10,7 @@ import org.springframework.stereotype.Repository;
 public interface TenantRepository extends JpaRepository<Tenant, Long> {
     @Query("SELECT t FROM Tenant t WHERE t.username = :username AND t.password = :password")
     Tenant findByUsernameAndPassword(@Param("username") String username, @Param("password") String password);
+
+    @Query("SELECT t FROM Tenant t WHERE t.username = :username")
+    Tenant findByUsername(@Param("username") String username);
 }

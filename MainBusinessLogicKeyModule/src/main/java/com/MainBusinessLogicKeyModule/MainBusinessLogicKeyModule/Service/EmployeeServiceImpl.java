@@ -25,12 +25,45 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     @Transactional
-    public void addEmployee(Object payload) {
+    public ResponseEntity<String> addEmployee(Object payload) {
         // Verifica se il payload è un array o un singolo oggetto
-        if (payload instanceof List) {
-            @SuppressWarnings("unchecked")
-            List<Map<String, Object>> payloadList = (List<Map<String, Object>>) payload;
-            for (Map<String, Object> singlePayload : payloadList) {
+        switch (payload) {
+            case List list when ((List<?>) payload).size() > 1 -> {
+                @SuppressWarnings("unchecked")
+                List<Map<String, Object>> payloadList = (List<Map<String, Object>>) list;
+                for (Map<String, Object> singlePayload : payloadList) {
+                    Employee employee = new Employee();
+
+                    log.info("Aggiornamento impiegato: ID = {}, Role = {}, Name = {}, Card = {}, Pin = {}",
+                            singlePayload.get("EmployeeId"),
+                            singlePayload.get("EmployeeRole"),
+                            singlePayload.get("EmployeeName"),
+                            singlePayload.get("EmployeeCard"),
+                            singlePayload.get("EmployeePin"));
+
+                    employee.setEmployeeId((String) singlePayload.get("EmployeeId"));
+                    employee.setEmployeeRole((String) singlePayload.get("EmployeeRole"));
+                    employee.setEmployeeName((String) singlePayload.get("EmployeeName"));
+                    employee.setEmployeeCard((String) singlePayload.get("EmployeeCard"));
+
+                    Optional<Employee> employeeExisting = employeeRepository.findById((String) singlePayload.get("EmployeeId"));
+                    Employee emp = employeeRepository.findByEmployeeCard(employee.getEmployeeCard());
+
+                    if (employeeExisting.isPresent()) {
+                        log.info("Impiegato con ID {} già esistente, non verrà inserito", singlePayload.get("EmployeeId"));
+                        return ResponseEntity.ok("Impiegato già esistente, non verrà inserito");
+                    } else if (emp != null) {
+                        return ResponseEntity.status(409).body("Codice badge già registrato, non verrà inserito");
+                    } else {
+                        employeeRepository.save(employee);
+                        log.info("Impiegato con ID {} inserito con successo", employee.getEmployeeId());
+                        return ResponseEntity.ok("Inserimento avvenuto con successo");
+                    }
+                }
+            }
+            case List list when ((List<?>) payload).size() == 1 -> {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> singlePayload = (Map<String, Object>) list.getFirst();
                 Employee employee = new Employee();
 
                 log.info("Aggiornamento impiegato: ID = {}, Role = {}, Name = {}, Card = {}, Pin = {}",
@@ -46,40 +79,55 @@ public class EmployeeServiceImpl implements EmployeeService {
                 employee.setEmployeeCard((String) singlePayload.get("EmployeeCard"));
 
                 Optional<Employee> employeeExisting = employeeRepository.findById((String) singlePayload.get("EmployeeId"));
+                Employee emp = employeeRepository.findByEmployeeCard(employee.getEmployeeCard());
                 if (employeeExisting.isPresent()) {
                     log.info("Impiegato con ID {} già esistente, non verrà inserito", singlePayload.get("EmployeeId"));
+                    return ResponseEntity.status(200).body("Impiegato già esistente, non verrà inserito");
+                } else if (emp != null) {
+                    return ResponseEntity.status(409).body("Codice badge già registrato, non verrà inserito");
                 } else {
                     employeeRepository.save(employee);
                     log.info("Impiegato con ID {} inserito con successo", employee.getEmployeeId());
+                    return ResponseEntity.ok("Inserimento avvenuto con successo");
                 }
             }
-        } else if (payload instanceof Map) {
-            @SuppressWarnings("unchecked")
-            Map<String, Object> singlePayload = (Map<String, Object>) payload;
-            Employee employee = new Employee();
+            case Map map -> {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> singlePayload = (Map<String, Object>) payload;
+                Employee employee = new Employee();
 
-            log.info("Aggiornamento impiegato: ID = {}, Role = {}, Name = {}, Card = {}, Pin = {}",
-                    singlePayload.get("EmployeeId"),
-                    singlePayload.get("EmployeeRole"),
-                    singlePayload.get("EmployeeName"),
-                    singlePayload.get("EmployeeCard"),
-                    singlePayload.get("EmployeePin"));
+                log.info("Aggiornamento impiegato: ID = {}, Role = {}, Name = {}, Card = {}, Pin = {}",
+                        singlePayload.get("EmployeeId"),
+                        singlePayload.get("EmployeeRole"),
+                        singlePayload.get("EmployeeName"),
+                        singlePayload.get("EmployeeCard"),
+                        singlePayload.get("EmployeePin"));
 
-            employee.setEmployeeId((String) singlePayload.get("EmployeeId"));
-            employee.setEmployeeRole((String) singlePayload.get("EmployeeRole"));
-            employee.setEmployeeName((String) singlePayload.get("EmployeeName"));
-            employee.setEmployeeCard((String) singlePayload.get("EmployeeCard"));
+                employee.setEmployeeId((String) singlePayload.get("EmployeeId"));
+                employee.setEmployeeRole((String) singlePayload.get("EmployeeRole"));
+                employee.setEmployeeName((String) singlePayload.get("EmployeeName"));
+                employee.setEmployeeCard((String) singlePayload.get("EmployeeCard"));
 
-            Optional<Employee> employeeExisting = employeeRepository.findById((String) singlePayload.get("EmployeeId"));
-            if (employeeExisting.isPresent()) {
-                log.info("Impiegato con ID {} già esistente, non verrà inserito", singlePayload.get("EmployeeId"));
-            } else {
-                employeeRepository.save(employee);
-                log.info("Impiegato con ID {} inserito con successo", employee.getEmployeeId());
+                Optional<Employee> employeeExisting = employeeRepository.findById((String) singlePayload.get("EmployeeId"));
+
+                Employee emp = employeeRepository.findByEmployeeCard(employee.getEmployeeCard());
+
+                if (employeeExisting.isPresent()) {
+                    log.info("Impiegato con ID {} già esistente, non verrà inserito", singlePayload.get("EmployeeId"));
+                    return ResponseEntity.status(200).body("Impiegato già esistente, non verrà inserito");
+                } else if (emp != null) {
+                    return ResponseEntity.status(409).body("Codice badge già registrato, non verrà inserito");
+                } else {
+                    employeeRepository.save(employee);
+                    log.info("Impiegato con ID {} inserito con successo", employee.getEmployeeId());
+                    return ResponseEntity.ok("Inserimento avvenuto con successo");
+                }
             }
-        } else {
-            throw new IllegalArgumentException("Formato del payload non valido. Atteso array o oggetto singolo.");
+            case null, default -> {
+                return ResponseEntity.status(400).body("Payload malformed");
+            }
         }
+        return null;
     }
 
     @Override
@@ -99,7 +147,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             return ResponseEntity.ok("Aggiornamento avvenuto con successo");
         } else {
             log.info("Employee not found");
-            return ResponseEntity.ok("Utente non trovato");
+            return ResponseEntity.status(404).body("Utente non trovato");
         }
     }
 
@@ -115,7 +163,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             return ResponseEntity.ok("Eliminazione avvenuta con successo");
         } else {
             log.info("Employee not found");
-            return ResponseEntity.ok("Utente non trovato");
+            return ResponseEntity.status(404).body("Utente non trovato");
         }
     }
 }

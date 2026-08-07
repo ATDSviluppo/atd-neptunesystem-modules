@@ -26,6 +26,10 @@ public interface PlanningRepository extends JpaRepository<Planning, String> {
     @Query("DELETE FROM Planning p WHERE p IN :plannings")
     void deleteAllByPlannings(@Param("plannings") List<Planning> plannings);
 
+    @Modifying
+    @Query("DELETE FROM Planning p WHERE p = :planningId")
+    void deleteAllByPlannings(@Param("planningId") String planningId);
+
     @Query("SELECT p FROM Planning p WHERE p.PlanningId = :planningId")
     List<Planning> findByPlanningId(@Param("planningId") String planningId);
 

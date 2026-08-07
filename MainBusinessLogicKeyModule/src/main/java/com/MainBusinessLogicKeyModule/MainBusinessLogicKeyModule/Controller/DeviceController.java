@@ -24,8 +24,8 @@ public class DeviceController {
 
     @CrossOrigin(origins = "*")
     @PostMapping("/Devices")
-    public void addDevice(@RequestBody List<Map<String, Object>> payload) {
-        deviceService.addDevice(payload);
+    public ResponseEntity<String> addDevice(@RequestBody List<Map<String, Object>> payload) {
+        return deviceService.addDevice(payload);
     }
 
     @CrossOrigin(origins = "*")
@@ -36,8 +36,8 @@ public class DeviceController {
 
     @CrossOrigin(origins = "*")
     @DeleteMapping("/Devices")
-    public void deleteDevice(@RequestBody Map<String, Object> payload) {
-        deviceService.deleteDevice(payload);
+    public ResponseEntity<String> deleteDevice(@RequestBody Map<String, Object> payload) {
+        return deviceService.deleteDevice(payload);
     }
 
 }

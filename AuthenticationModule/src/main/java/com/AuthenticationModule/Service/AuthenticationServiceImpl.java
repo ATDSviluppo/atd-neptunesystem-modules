@@ -91,12 +91,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             Employee employee = employeeRepository.findByEmployeeCard(employeeCardPadded);
             setBadgeCode(employeeCardPadded);
             if (employee != null) {
-                if (operationMode.isTurnbackMode()) {
+                if (OperationMode.isTurnbackMode()) {
                     latchManager.countDownBadgeScanLatch();
                 } else if ("Charger".equals(employee.getEmployeeRole())) {
-                    operationMode.setMode(OperationMode.CHARGE);
+                    OperationMode.setMode(OperationMode.CHARGE);
                 } else if ("User".equals(employee.getEmployeeRole()) || "Assistant".equals(employee.getEmployeeRole())) {
-                    operationMode.setMode(OperationMode.RETREAT);
+                    OperationMode.setMode(OperationMode.RETREAT);
                 }
                 handleEmployeeAuthentication(employee, employeeCard);
                 return ResponseEntity.ok("Elaborazione completata per l'utente");
@@ -117,15 +117,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Transactional
     private ResponseEntity<String> handleEmployeeAuthentication(Employee employee, String employeeCard) throws JsonProcessingException {
-        log.info("Badge letto: {} in modalità: {}", employeeCard, operationMode.getMode());
+        log.info("Badge letto: {} in modalità: {}", employeeCard, OperationMode.getMode());
         ObjectMapper objectMapper = new ObjectMapper();
-        if (operationMode.isRetreatMode() || operationMode.isChargeMode()) {
+        if (OperationMode.isRetreatMode() || OperationMode.isChargeMode()) {
             setBadgeCode(employeeCard);
             socketResponse.sendOperationResponse("Welcome", "Benvenuto " + employee.getEmployeeName(), objectMapper);
             UserChoiceDTO device = deliveryService.analizeUserChoice(employee);
-        } else if (operationMode.isTurnbackMode()) {
+        } else if (OperationMode.isTurnbackMode()) {
             latchManager.countDownBadgeScanLatch();
-            operationMode.setMode(OperationMode.RETREAT);
+            OperationMode.setMode(OperationMode.RETREAT);
         }
 
         return ResponseEntity.ok("Utente " + employee.getEmployeeName() + " trovato");
@@ -135,7 +135,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (!Objects.equals(getBadgeCode(), "") && getBadgeCode() != null) {
             log.info("badge code" + getBadgeCode());
             Employee employee = employeeRepository.findByEmployeeCard(getBadgeCode());
-            if (operationMode.isChargeMode()) {
+            if (OperationMode.isChargeMode()) {
                 if (deliveryService.analizeUserCharge(employeeCard)) {
                     log.info("Dispositivo caricato");
                     OperationMode.setMode(OperationMode.RETREAT);

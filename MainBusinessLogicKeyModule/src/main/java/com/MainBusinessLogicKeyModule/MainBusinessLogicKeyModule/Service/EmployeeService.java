@@ -13,7 +13,7 @@ public interface EmployeeService {
     List<Employee> getEmployee();
 
     @Transactional
-    void addEmployee(Object payload);
+    ResponseEntity<String> addEmployee(Object payload);
 
     @Transactional
     ResponseEntity<String> updateEmployee(Map<String, Object> payloadList);

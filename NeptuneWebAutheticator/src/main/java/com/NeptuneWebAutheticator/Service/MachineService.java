@@ -24,4 +24,10 @@ public interface MachineService {
 
     @Transactional
     ResponseEntity<String> deleteMachine(HttpServletRequest request, Map<String, Object> payloadList);
+
+    @Transactional
+    ResponseEntity<String> addTenant(HttpServletRequest request, Map<String, Object> payloadList);
+
+    @Transactional
+    ResponseEntity<String> updateTenant(HttpServletRequest request, Map<String, Object> payloadList);
 }

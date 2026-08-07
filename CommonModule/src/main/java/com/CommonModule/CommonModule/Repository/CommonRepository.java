@@ -27,4 +27,20 @@ public interface CommonRepository extends JpaRepository<Device, String> {
 
     @Query("SELECT d FROM Device d WHERE d.Holder = :holder")
     List<Device> findByHolder(@Param("holder") boolean holder);
+
+    //mettere holder come parametro se si vuole gestire carico da portale ns
+    @Query(value = """
+            SELECT DISTINCT
+                ed.Description AS DetailDescription,
+                et.Description AS TypeDescription,
+                et.enumDeviceTypeId,
+                ed.DeviceDetailId
+            FROM device d
+            JOIN enumdevicedetail ed
+                ON d.DeviceDetailId = ed.DeviceDetailId
+            JOIN enumdevicetype et
+                ON d.DeviceTypeId = et.enumDeviceTypeId
+            WHERE d.Holder = true
+            """, nativeQuery = true)
+    List<Object[]> findDetailsAndTypesWhereHolderTrue();
 }

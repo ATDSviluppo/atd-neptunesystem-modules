@@ -3,6 +3,7 @@ package com.MainBusinessLogicKeyModule.MainBusinessLogicKeyModule.Controller;
 import com.MainBusinessLogicKeyModule.MainBusinessLogicKeyModule.Entity.Planning;
 import com.MainBusinessLogicKeyModule.MainBusinessLogicKeyModule.Service.PlanningService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,30 +15,26 @@ public class PlanningController {
     private PlanningService planningService;
 
     @CrossOrigin(origins = "*")
-    @GetMapping ("/Planning")
-    public List<Planning> getPlanning()
-    {
-       return planningService.getPlanning();
+    @GetMapping("/Planning")
+    public List<Planning> getPlanning() {
+        return planningService.getPlanning();
     }
 
     @CrossOrigin(origins = "*")
     @PostMapping("/Planning")
-    public void addPlanning(@RequestBody List<Map<String, Object>> payload)
-    {
-        planningService.addPlanning(payload);
+    public ResponseEntity<String> addPlanning(@RequestBody List<Map<String, Object>> payload) {
+        return planningService.addPlanning(payload);
     }
 
     @CrossOrigin(origins = "*")
     @PutMapping("/Planning")
-    public void updatePlanning(@RequestBody List<Map<String, Object>> payload)
-    {
-        planningService.updatePlanning(payload);
+    public ResponseEntity<String> updatePlanning(@RequestBody List<Map<String, Object>> payload) {
+        return planningService.updatePlanning(payload);
     }
 
     @CrossOrigin(origins = "*")
     @DeleteMapping("/Planning")
-    public void deletePlanning(@RequestBody List<Map<String, Object>> payload)
-    {
-        planningService.deletePlanning(payload);
+    public ResponseEntity<String> deletePlanning(@RequestBody List<Map<String, Object>> payload) {
+        return planningService.deletePlanning(payload);
     }
 }

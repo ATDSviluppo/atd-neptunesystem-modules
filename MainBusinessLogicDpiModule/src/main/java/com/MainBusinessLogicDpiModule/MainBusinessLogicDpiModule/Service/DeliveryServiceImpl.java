@@ -99,7 +99,6 @@ public class DeliveryServiceImpl implements CommonService, DeliveryService {
         if (authenticationService.isUserAuthenticate()) {
             if (employee != null) {
                 UserChoiceDTO userChoiceDTO = new UserChoiceDTO();
-                Set<String> seenEnumDeviceTypeIds = new HashSet<>();
                 EmployeeDTO employeeDTO = DeviceMapper.setEmployeeDTO(employee);
                 List<DeviceDetailDTO> deviceDetailDTOList = new ArrayList<>();
                 List<DeviceTypeDTO> deviceTypeDTOList = new ArrayList<>();
@@ -541,44 +540,6 @@ public class DeliveryServiceImpl implements CommonService, DeliveryService {
 
         return true;
     }
-
-  /*  @Override
-    public boolean analizeSingleCharger() {
-        List<Device> deviceList = deliveryRepository.findByHolder(false);
-
-        for (Device d : deviceList) {
-            Date eventTimestamp = new Date();
-            SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SS");
-            sdf.format(eventTimestamp);
-            Event event = new Event(eventTimestamp, "Load", d.getDeviceId(), "", d.getDeviceDetail(), d.getDeviceType(), d.getLocation(), d.getMachineId(), "", true);
-            eventRepository.save(event);
-
-            deliveryRepository.updateDeviceCharged(d.getDeviceId(), String.valueOf(UUID.randomUUID()));
-        }
-
-        return true;
-    }*/
-
-//    @Override
-//    public ResponseEntity<String> handleDeviceTurnBack(Device device, String employeeCard, ObjectMapper objectMapper) throws InterruptedException, JsonProcessingException {
-//        if (analizeUserTurnBack(employeeCard)) {
-//            // Procedo con le operazioni di apertura
-//            HttpStatus httpStatus = machineCommandService.openMachineDoor(device.getDrumId().toString(), device.getSectorId().toString());
-//            if (httpStatus == HttpStatus.OK) {
-//                log.info("Operazione completata per dispositivo con EPC code: " + employeeCard);
-//
-//                Thread.sleep(machineProperties.getTimeCloseDoor());
-//                machineCommandService.closeMachineDoor(device.getDrumId().toString(), device.getSectorId().toString());
-//                return ResponseEntity.ok("Operazione completata per dispositivo " + device.getDeviceId());
-//            } else {
-//                socketResponse.sendOperationResponse("Failed", "Macchina non connessa, si prega di riavviare il tablet e il dispenser", objectMapper);
-//                return ResponseEntity.status(500).body("Operazione riuscita");
-//            }
-//
-//        } else {
-//            return ResponseEntity.status(404).body("Dispositivo o Utente non censito");
-//        }
-//    }
 
     @Override
     public List<EmployeeDTO> getEmployeeForAssistantRetreat() {

@@ -14,4 +14,6 @@ public class DeviceDTO {
 
     private String objectId;
 
+    private String deviceSizeId;
+
 }
