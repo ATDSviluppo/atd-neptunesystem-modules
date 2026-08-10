@@ -1,7 +1,7 @@
-package com.MailModule.MailModule.Mapper;
+package com.MailModule.Mapper;
 
-import com.MailModule.MailModule.DTO.EmployeeConstructorDTO;
-import com.MailModule.MailModule.Repository.MailRepository;
+import com.MailModule.DTO.EmployeeConstructorDTO;
+import com.MailModule.Repository.MailRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;

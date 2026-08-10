@@ -1,6 +1,6 @@
-package com.MailModule.MailModule.Repository;
+package com.MailModule.Repository;
 
-import com.MailModule.MailModule.Entity.EmployeeMailConstructor;
+import com.MailModule.Entity.EmployeeMailConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

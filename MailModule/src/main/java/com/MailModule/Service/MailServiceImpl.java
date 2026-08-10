@@ -1,7 +1,7 @@
-package com.MailModule.MailModule.Service;
+package com.MailModule.Service;
 
-import com.MailModule.MailModule.Entity.EmployeeMailConstructor;
-import com.MailModule.MailModule.Repository.MailRepository;
+import com.MailModule.Entity.EmployeeMailConstructor;
+import com.MailModule.Repository.MailRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

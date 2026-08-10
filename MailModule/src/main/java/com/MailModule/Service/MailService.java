@@ -1,6 +1,6 @@
-package com.MailModule.MailModule.Service;
+package com.MailModule.Service;
 
-import com.MailModule.MailModule.Entity.EmployeeMailConstructor;
+import com.MailModule.Entity.EmployeeMailConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

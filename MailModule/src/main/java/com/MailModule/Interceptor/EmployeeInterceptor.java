@@ -1,8 +1,8 @@
-package com.MailModule.MailModule.Interceptor;
+package com.MailModule.Interceptor;
 
-import com.MailModule.MailModule.DTO.EmployeeConstructorDTO;
-import com.MailModule.MailModule.Mapper.EmployeeConstructorMapper;
-import com.MailModule.MailModule.Repository.MailRepository;
+import com.MailModule.DTO.EmployeeConstructorDTO;
+import com.MailModule.Mapper.EmployeeConstructorMapper;
+import com.MailModule.Repository.MailRepository;
 import com.MailModule.MailModule.Wrapper.CachedBodyHttpServletRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;

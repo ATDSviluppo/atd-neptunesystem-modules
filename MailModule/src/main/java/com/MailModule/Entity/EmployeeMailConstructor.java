@@ -1,4 +1,4 @@
-package com.MailModule.MailModule.Entity;
+package com.MailModule.Entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

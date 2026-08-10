@@ -1,4 +1,4 @@
-package com.MailModule.MailModule.DTO;
+package com.MailModule.DTO;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
