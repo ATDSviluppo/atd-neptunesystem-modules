@@ -18,7 +18,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/sendMail").permitAll()
-                        .requestMatchers("/api/login", "/api/getUserRoleAuthenticated", "/api/isUserAuthenticate", "/Machine", "/api/Tenant", "/api/logout").permitAll()
+                        .requestMatchers("/api/login", "/api/getUserRoleAuthenticated", "/api/isUserAuthenticate", "/Machine", "/api/Tenant", "/api/logout", "/api/modules", "/api/modules/{jarName}").permitAll()
                         .anyRequest().authenticated()
                 )
                 .build();

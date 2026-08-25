@@ -8,7 +8,11 @@ import com.NeptuneWebAutheticator.Repository.TenantRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,10 +20,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 @Service
 public class MachineServiceImpl implements MachineService {
@@ -163,6 +172,64 @@ public class MachineServiceImpl implements MachineService {
             return ResponseEntity.ok("Utente aggiornato con successo");
         } else {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @Override
+    public ResponseEntity<List<String>> getPlugin() throws IOException {
+        Path modulesPath = Paths.get("/home/appl/NeptunePortal/Plugin");
+
+        if (!Files.exists(modulesPath)) {
+            return ResponseEntity.ok(List.of());
+        }
+
+        try (Stream<Path> stream = Files.list(modulesPath)) {
+            List<String> jars = stream
+                    .filter(Files::isRegularFile)
+                    .filter(path -> path.toString().toLowerCase().endsWith(".jar"))
+                    .map(path -> path.getFileName().toString())
+                    .toList();
+
+            return ResponseEntity.ok(jars);
+        }
+    }
+
+    @Override
+    public ResponseEntity<Resource> getJarPlugin(String jarName) {
+        try {
+            Path pluginFolder = Paths.get("/home/appl/NeptunePortal/Plugin");
+
+            Path jarPath = pluginFolder
+                    .resolve(jarName)
+                    .normalize();
+
+            if (!jarPath.startsWith(pluginFolder)) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            if (!Files.exists(jarPath) || !Files.isRegularFile(jarPath)) {
+                return ResponseEntity.notFound().build();
+            }
+
+            if (!jarPath.getFileName()
+                    .toString()
+                    .toLowerCase()
+                    .endsWith(".jar")) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            Resource resource = new FileSystemResource(jarPath);
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .header(
+                            HttpHeaders.CONTENT_DISPOSITION,
+                            "attachment; filename=\"" + jarPath.getFileName() + "\""
+                    )
+                    .body(resource);
+
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
         }
     }
 }
