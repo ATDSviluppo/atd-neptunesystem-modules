@@ -2,11 +2,12 @@ package com.MailModule.Controller;
 
 import com.MailModule.Entity.EmployeeMailConstructor;
 import com.MailModule.Service.MailService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.sql.Date;
 import java.util.List;
 
 
@@ -20,5 +21,11 @@ public class MailController {
     @GetMapping("/getEmployeeWithEmailNotNull")
     public List<EmployeeMailConstructor> getEmployeeWithEmailNotNull() {
        return mailService.findByEmailNotNullOrEmpty();
+    }
+
+    @CrossOrigin(origins = "*")
+    @GetMapping("/getEmailToSendExpirationAdvice")
+    public List<String> getEmailToSendExpirationAdvice(@RequestParam int daysBeforeExpiration) throws JsonProcessingException {
+        return mailService.getEmailToSendExpirationAdvice(daysBeforeExpiration);
     }
 }

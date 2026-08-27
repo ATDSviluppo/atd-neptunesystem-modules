@@ -3,7 +3,7 @@ package com.MailModule.Interceptor;
 import com.MailModule.DTO.EmployeeConstructorDTO;
 import com.MailModule.Mapper.EmployeeConstructorMapper;
 import com.MailModule.Repository.MailRepository;
-import com.MailModule.MailModule.Wrapper.CachedBodyHttpServletRequest;
+import com.MailModule.Wrapper.CachedBodyHttpServletRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

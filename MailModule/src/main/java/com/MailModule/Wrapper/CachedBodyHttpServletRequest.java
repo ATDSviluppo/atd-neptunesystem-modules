@@ -1,4 +1,4 @@
-package com.MailModule.MailModule.Wrapper;
+package com.MailModule.Wrapper;
 
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletInputStream;
