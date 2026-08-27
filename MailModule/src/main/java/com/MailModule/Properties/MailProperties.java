@@ -21,4 +21,7 @@ public class MailProperties {
     @Value("${mail.body}")
     private String body;
 
+    @Value("${mail.url}")
+    private String url;
+
 }
