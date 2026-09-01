@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="
+             http://maven.apache.org/POM/4.0.0
+             https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.atd</groupId>
+    <artifactId>atd-neptunesystem-modules</artifactId>
+    <version>1.0.0</version>
+
+    <packaging>pom</packaging>
+
+    <name>ATD NeptuneSystem Modules</name>
+    <description>Distribution Business Logic Modules</description>
+
+    <modules>
+        <module>AuthenticationModule</module>
+        <module>CommonModule</module>
+        <module>HMIModule</module>
+        <module>HardwareManagerModule</module>
+        <module>MailModule</module>
+        <module>MainBusinessLogicDpiModule</module>
+        <module>MainBusinessLogicKeyModule</module>
+        <module>MobileModule</module>
+        <module>NeptuneWebAutheticator</module>
+        <module>PluginManager</module>
+        <module>SMTPServerManager</module>
+        <module>SafetyModule</module>
+        <module>ZCarFleetModule</module>
+    </modules>
+
+</project>
