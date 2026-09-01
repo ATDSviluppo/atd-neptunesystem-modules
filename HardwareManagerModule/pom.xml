@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.HardwareManagerModule</groupId>
 	<artifactId>hardwaremanagermodule</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>HardwareManagerModule</name>
 	<description>HardwareManagerModule for NeptuneSystem</description>
 	<url/>
@@ -56,7 +56,7 @@
 		<dependency>
 			<groupId>com.CommonModule</groupId>
 			<artifactId>commonmodule</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>1.0.0</version>
 		</dependency>
 	</dependencies>
 

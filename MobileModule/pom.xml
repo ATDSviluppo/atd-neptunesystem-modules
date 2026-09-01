@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.Mobile</groupId>
 	<artifactId>Mobile</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>Mobile</name>
 	<description>MobileModule</description>
 	<url/>
@@ -69,12 +69,12 @@
 		<dependency>
 			<groupId>com.AuthenticationModule</groupId>
 			<artifactId>authenticationmodule</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>1.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.CommonModule</groupId>
 			<artifactId>commonmodule</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>1.0.0</version>
 		</dependency>
 	</dependencies>
 

@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.CommonModule</groupId>
 	<artifactId>CommonModule</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>commonmodule</name>
 	<description>CommonModule for neptune System</description>
 	<url/>
