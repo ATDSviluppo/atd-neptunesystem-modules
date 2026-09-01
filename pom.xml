@@ -21,7 +21,6 @@
         <module>CommonModule</module>
         <module>HMIModule</module>
         <module>HardwareManagerModule</module>
-        <module>MailModule</module>
         <module>MainBusinessLogicDpiModule</module>
         <module>MainBusinessLogicKeyModule</module>
         <module>MobileModule</module>
