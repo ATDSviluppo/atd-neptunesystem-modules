@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.MainBusinessLogicKeyModule</groupId>
-	<artifactId>MainBusinessLogicKeyModule</artifactId>
+	<artifactId>mainbusinesslogickeymodule</artifactId>
 	<version>1.0.0</version>
 	<name>MainBusinessLogicKeyModule</name>
 	<description>MainBusinessLogicKeyModule for neptune System</description>

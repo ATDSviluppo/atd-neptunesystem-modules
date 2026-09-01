@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.MainBusinessLogicDpiModule</groupId>
-    <artifactId>MainBusinessLogicDpiModule</artifactId>
+    <artifactId>mainbusinesslogicdpimodule</artifactId>
     <version>1.0.0</version>
     <name>MainBusinessLogicDpiModule</name>
     <description>MainBusinessLogicDpiModule for NeptuneSystem</description>
