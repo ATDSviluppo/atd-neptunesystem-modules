@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.AuthenticationModule</groupId>
 	<artifactId>authenticationmodule</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>AuthenticationModule</name>
 	<description>Modulo di autenticazione per NeptuneSystem</description>
 	<url/>
@@ -85,12 +85,12 @@
 		<dependency>
 			<groupId>com.HMIModule</groupId>
 			<artifactId>hmimodule</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>1.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.CommonModule</groupId>
 			<artifactId>commonmodule</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>1.0.0</version>
 		</dependency>
 	</dependencies>
 
