@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.Mobile</groupId>
-	<artifactId>Mobile</artifactId>
+	<artifactId>mobile</artifactId>
 	<version>1.0.0</version>
 	<name>Mobile</name>
 	<description>MobileModule</description>

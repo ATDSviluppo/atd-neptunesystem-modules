@@ -24,7 +24,6 @@
         <module>MainBusinessLogicDpiModule</module>
         <module>MainBusinessLogicKeyModule</module>
         <module>MobileModule</module>
-        <module>NeptuneWebAutheticator</module>
         <module>PluginManager</module>
         <module>SMTPServerManager</module>
         <module>SafetyModule</module>
