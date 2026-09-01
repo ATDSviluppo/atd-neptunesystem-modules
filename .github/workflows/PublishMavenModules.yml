@@ -20,23 +20,40 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Detect changed modules
+      - name: Detect modules
         id: detect
         shell: bash
         run: |
           modules=()
 
-          for dir in */; do
-            if [ -f "${dir}pom.xml" ]; then
-              module="${dir%/}"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
 
-              if ! git diff --quiet HEAD^ HEAD -- "$dir"; then
+            echo "Manual execution: publishing all modules"
+
+            for dir in */; do
+              if [ -f "${dir}pom.xml" ]; then
+                module="${dir%/}"
                 modules+=("$module")
               fi
-            fi
-          done
+            done
 
-          echo "Changed modules:"
+          else
+
+            echo "Push execution: detecting changed modules"
+
+            for dir in */; do
+              if [ -f "${dir}pom.xml" ]; then
+                module="${dir%/}"
+
+                if ! git diff --quiet HEAD^ HEAD -- "$dir"; then
+                  modules+=("$module")
+                fi
+              fi
+            done
+
+          fi
+
+          echo "Modules to publish:"
           printf '%s\n' "${modules[@]}"
 
           if [ ${#modules[@]} -eq 0 ]; then
