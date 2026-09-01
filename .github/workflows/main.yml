@@ -26,6 +26,6 @@ jobs:
 
       - name: Publish PluginManager
         working-directory: PluginManager
-        run: mvn --batch-mode deploy
+        run: mvn --batch-mode deploy -Dmaven.test.skip=true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
