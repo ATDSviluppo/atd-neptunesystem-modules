@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.HardwareManagerModule</groupId>
-	<artifactId>HardwareManagerModule</artifactId>
+	<artifactId>hardwaremanagermodule</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>HardwareManagerModule</name>
 	<description>HardwareManagerModule for NeptuneSystem</description>
@@ -55,7 +55,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.CommonModule</groupId>
-			<artifactId>CommonModule</artifactId>
+			<artifactId>commonmodule</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
@@ -76,5 +76,11 @@
 			</plugin>
 		</plugins>
 	</build>
-
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<name>GitHub Packages</name>
+			<url>https://maven.pkg.github.com/ATDSviluppo/atd-neptunesystem-modules</url>
+		</repository>
+	</distributionManagement>
 </project>

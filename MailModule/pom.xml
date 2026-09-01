@@ -8,8 +8,8 @@
 		<version>3.3.1</version>
 		<relativePath/>
 	</parent>
-	<groupId>com.MailModule</groupId>
-	<artifactId>MailModule</artifactId>
+	<groupId>com.MailPlugin</groupId>
+	<artifactId>MailPlugin</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name/>
 	<description/>

@@ -11,7 +11,7 @@
 	<groupId>com.CommonModule</groupId>
 	<artifactId>CommonModule</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>CommonModule</name>
+	<name>commonmodule</name>
 	<description>CommonModule for neptune System</description>
 	<url/>
 	<licenses>
@@ -71,5 +71,11 @@
 			</plugin>
 		</plugins>
 	</build>
-
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<name>GitHub Packages</name>
+			<url>https://maven.pkg.github.com/ATDSviluppo/atd-neptunesystem-modules</url>
+		</repository>
+	</distributionManagement>
 </project>
