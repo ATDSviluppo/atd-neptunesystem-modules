@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.CommonModule</groupId>
-	<artifactId>CommonModule</artifactId>
+	<artifactId>commonmodule</artifactId>
 	<version>1.0.0</version>
 	<name>commonmodule</name>
 	<description>CommonModule for neptune System</description>
