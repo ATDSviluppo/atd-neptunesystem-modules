@@ -97,11 +97,6 @@
 			<version>1.0.0.RELEASE</version>
 		</dependency>
 		<dependency>
-			<groupId>com.AuthenticationModule</groupId>
-			<artifactId>authenticationmodule</artifactId>
-			<version>1.0.0</version>
-		</dependency>
-		<dependency>
 			<groupId>com.CommonModule</groupId>
 			<artifactId>commonmodule</artifactId>
 			<version>1.0.0</version>
