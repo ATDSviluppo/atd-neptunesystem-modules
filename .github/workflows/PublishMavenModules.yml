@@ -1,0 +1,100 @@
+name: Publish Maven Modules
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches:
+      - main
+
+jobs:
+  detect-modules:
+    runs-on: ubuntu-latest
+
+    outputs:
+      modules: ${{ steps.detect.outputs.modules }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect changed modules
+        id: detect
+        shell: bash
+        run: |
+          modules=()
+
+          for dir in */; do
+            if [ -f "${dir}pom.xml" ]; then
+              module="${dir%/}"
+
+              if ! git diff --quiet HEAD^ HEAD -- "$dir"; then
+                modules+=("$module")
+              fi
+            fi
+          done
+
+          echo "Changed modules:"
+          printf '%s\n' "${modules[@]}"
+
+          if [ ${#modules[@]} -eq 0 ]; then
+            echo 'modules=[]' >> "$GITHUB_OUTPUT"
+          else
+            printf '%s\n' "${modules[@]}" \
+              | jq -R -s -c 'split("\n") | map(select(length > 0))' \
+              >> "$GITHUB_OUTPUT"
+          fi
+
+  publish:
+    needs: detect-modules
+
+    if: needs.detect-modules.outputs.modules != '[]'
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        module: ${{ fromJson(needs.detect-modules.outputs.modules) }}
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          server-id: github
+          server-username: GITHUB_ACTOR
+          server-password: GITHUB_TOKEN
+
+      - name: Check version
+        working-directory: ${{ matrix.module }}
+        shell: bash
+        run: |
+          VERSION=$(mvn help:evaluate \
+            -Dexpression=project.version \
+            -q \
+            -DforceStdout)
+
+          echo "Module: ${{ matrix.module }}"
+          echo "Version: $VERSION"
+
+          if [[ "$VERSION" == *"-SNAPSHOT" ]]; then
+            echo "ERROR: SNAPSHOT versions cannot be published."
+            exit 1
+          fi
+
+      - name: Publish ${{ matrix.module }}
+        working-directory: ${{ matrix.module }}
+        run: |
+          mvn --batch-mode deploy -Dmaven.test.skip=true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
