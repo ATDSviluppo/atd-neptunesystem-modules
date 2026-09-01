@@ -13,5 +13,5 @@ public interface MailService {
 
     boolean setupEmail(String employeeId, String email);
 
-    List<String> getEmailToSendExpirationAdvice(int daysBeforeExpiration) throws JsonProcessingException;
+    List<String> getEmailToSendExpirationAdvice() throws JsonProcessingException;
 }

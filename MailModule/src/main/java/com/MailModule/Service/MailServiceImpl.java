@@ -56,16 +56,17 @@ public class MailServiceImpl implements MailService {
         return count > 0;
     }
 
-//    @Scheduled(
-//            cron = "0 0 9 * * *",
-//            zone = "Europe/Rome"
-//    )
+    @Scheduled(
+            cron = "0 0 9 * * *",
+            zone = "Europe/Rome"
+    )
     @Override
-    public List<String> getEmailToSendExpirationAdvice(int daysBeforeExpiration)
+    public List<String> getEmailToSendExpirationAdvice()
             throws JsonProcessingException {
 
         Date currentDate = Date.valueOf(LocalDate.now());
         String url = mailProperties.getUrl() + "/api/sendMail";
+        int daysBeforeExpiration = mailProperties.getDaysBeforeExpiration();
 
         List<String> toAddress = mailRepository.getEmailToSendExpirationAdvice(
                 daysBeforeExpiration,

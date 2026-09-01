@@ -25,7 +25,7 @@ public class MailController {
 
     @CrossOrigin(origins = "*")
     @GetMapping("/getEmailToSendExpirationAdvice")
-    public List<String> getEmailToSendExpirationAdvice(@RequestParam int daysBeforeExpiration) throws JsonProcessingException {
-        return mailService.getEmailToSendExpirationAdvice(daysBeforeExpiration);
+    public List<String> getEmailToSendExpirationAdvice() throws JsonProcessingException {
+        return mailService.getEmailToSendExpirationAdvice();
     }
 }
