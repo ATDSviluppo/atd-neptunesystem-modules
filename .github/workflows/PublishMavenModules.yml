@@ -32,8 +32,7 @@ jobs:
 
             for dir in */; do
               if [ -f "${dir}pom.xml" ]; then
-                module="${dir%/}"
-                modules+=("$module")
+                modules+=("${dir%/}")
               fi
             done
 
@@ -56,13 +55,15 @@ jobs:
           echo "Modules to publish:"
           printf '%s\n' "${modules[@]}"
 
-          if [ ${#modules[@]} -eq 0 ]; then
-            echo 'modules=[]' >> "$GITHUB_OUTPUT"
-          else
-            printf '%s\n' "${modules[@]}" \
-              | jq -R -s -c 'split("\n") | map(select(length > 0))' \
-              >> "$GITHUB_OUTPUT"
-          fi
+          JSON=$(printf '%s\n' "${modules[@]}" | jq -R -s -c '
+            split("\n")
+            | map(select(length > 0))
+          ')
+
+          echo "JSON:"
+          echo "$JSON"
+
+          echo "modules=$JSON" >> "$GITHUB_OUTPUT"
 
   publish:
     needs: detect-modules
