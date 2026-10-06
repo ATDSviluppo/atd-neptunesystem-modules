@@ -23,7 +23,8 @@ public class EmailServiceImpl implements EmailService {
         try {
             Properties props = new Properties();
             props.put("mail.smtp.auth", "true");
-            props.put("mail.smtp.starttls.enable", "false");
+            props.put("mail.smtp.starttls.enable", "true");
+            props.put("mail.smtp.ssl.trust", "*");
             props.put("mail.smtp.host", mailProperties.getMailServerHost());
             props.put("mail.smtp.port", mailProperties.getMailServerPort());
             props.put("mail.debug", "true");
