@@ -1,14 +1,19 @@
 package com.SMTPServerManager.Service;
 
 import com.SMTPServerManager.Properties.MailProperties;
+import jakarta.activation.DataHandler;
 import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
+import jakarta.mail.util.ByteArrayDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -55,8 +60,45 @@ public class EmailServiceImpl implements EmailService {
             message.addRecipients(Message.RecipientType.BCC, address);
             message.addRecipients(Message.RecipientType.TO, "no-reply@zcsautomation.com");
             message.setSubject(subject);
-            message.setText(body);
-            message.setFrom(new InternetAddress(sender));
+
+            Object attachmentsObj = payload.get("Attachments");
+            if (attachmentsObj == null) {
+                attachmentsObj = payload.get("attachments");
+            }
+
+            if (attachmentsObj instanceof List<?> attachmentsList && !attachmentsList.isEmpty()) {
+                MimeMultipart multipart = new MimeMultipart();
+
+                // Testo della mail
+                MimeBodyPart textPart = new MimeBodyPart();
+                textPart.setText(body, "UTF-8");
+                multipart.addBodyPart(textPart);
+
+                // Allegati
+                for (Object item : attachmentsList) {
+                    if (item instanceof Map<?, ?> attMap) {
+                        String fileName = (String) (attMap.get("FileName") != null ? attMap.get("FileName") : attMap.get("fileName"));
+                        String contentType = (String) (attMap.get("ContentType") != null ? attMap.get("ContentType") : attMap.get("contentType"));
+                        if (contentType == null || contentType.isBlank()) {
+                            contentType = "application/octet-stream";
+                        }
+                        String base64Data = (String) (attMap.get("Data") != null ? attMap.get("Data") : attMap.get("data"));
+
+                        if (base64Data != null && !base64Data.isBlank()) {
+                            byte[] fileBytes = Base64.getDecoder().decode(base64Data);
+                            ByteArrayDataSource dataSource = new ByteArrayDataSource(fileBytes, contentType);
+                            MimeBodyPart attachmentPart = new MimeBodyPart();
+                            attachmentPart.setDataHandler(new DataHandler(dataSource));
+                            attachmentPart.setFileName(fileName != null ? fileName : "attachment");
+                            multipart.addBodyPart(attachmentPart);
+                        }
+                    }
+                }
+                message.setContent(multipart);
+            } else {
+                message.setText(body);
+            }
+
             Transport.send(message);
         } catch (MessagingException e) {
            return ResponseEntity.status(500).body("Errore durante l'invio " + e);
