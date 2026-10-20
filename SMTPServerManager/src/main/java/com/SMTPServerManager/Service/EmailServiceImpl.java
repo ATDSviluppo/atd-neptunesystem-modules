@@ -53,11 +53,15 @@ public class EmailServiceImpl implements EmailService {
 
             MimeMessage message = new MimeMessage(session);
             message.setFrom(new InternetAddress(sender, "Neptune System"));
-            InternetAddress[] address = new InternetAddress[toAddress.size()];
-            for (int i = 0; i < toAddress.size(); i++) {
-                address[i] = new InternetAddress(toAddress.get(i));
+            List<InternetAddress> addressList = new ArrayList<>();
+            for (String addr : toAddress) {
+                if (addr != null && !addr.trim().isEmpty()) {
+                    addressList.add(new InternetAddress(addr.trim()));
+                }
             }
-            message.addRecipients(Message.RecipientType.BCC, address);
+            if (!addressList.isEmpty()) {
+                message.addRecipients(Message.RecipientType.BCC, addressList.toArray(new InternetAddress[0]));
+            }
             message.addRecipients(Message.RecipientType.TO, "no-reply@zcsautomation.com");
             message.setSubject(subject);
 
@@ -66,35 +70,41 @@ public class EmailServiceImpl implements EmailService {
                 attachmentsObj = payload.get("attachments");
             }
 
-            if (attachmentsObj instanceof List<?> attachmentsList && !attachmentsList.isEmpty()) {
-                MimeMultipart multipart = new MimeMultipart();
+            if (attachmentsObj instanceof List) {
+                List<?> attachmentsList = (List<?>) attachmentsObj;
+                if (!attachmentsList.isEmpty()) {
+                    MimeMultipart multipart = new MimeMultipart();
 
-                // Testo della mail
-                MimeBodyPart textPart = new MimeBodyPart();
-                textPart.setText(body, "UTF-8");
-                multipart.addBodyPart(textPart);
+                    // Testo della mail
+                    MimeBodyPart textPart = new MimeBodyPart();
+                    textPart.setText(body, "UTF-8");
+                    multipart.addBodyPart(textPart);
 
-                // Allegati
-                for (Object item : attachmentsList) {
-                    if (item instanceof Map<?, ?> attMap) {
-                        String fileName = (String) (attMap.get("FileName") != null ? attMap.get("FileName") : attMap.get("fileName"));
-                        String contentType = (String) (attMap.get("ContentType") != null ? attMap.get("ContentType") : attMap.get("contentType"));
-                        if (contentType == null || contentType.isBlank()) {
-                            contentType = "application/octet-stream";
-                        }
-                        String base64Data = (String) (attMap.get("Data") != null ? attMap.get("Data") : attMap.get("data"));
+                    // Allegati
+                    for (Object item : attachmentsList) {
+                        if (item instanceof Map) {
+                            Map<?, ?> attMap = (Map<?, ?>) item;
+                            String fileName = (String) (attMap.get("FileName") != null ? attMap.get("FileName") : attMap.get("fileName"));
+                            String contentType = (String) (attMap.get("ContentType") != null ? attMap.get("ContentType") : attMap.get("contentType"));
+                            if (contentType == null || contentType.isBlank()) {
+                                contentType = "application/octet-stream";
+                            }
+                            String base64Data = (String) (attMap.get("Data") != null ? attMap.get("Data") : attMap.get("data"));
 
-                        if (base64Data != null && !base64Data.isBlank()) {
-                            byte[] fileBytes = Base64.getDecoder().decode(base64Data);
-                            ByteArrayDataSource dataSource = new ByteArrayDataSource(fileBytes, contentType);
-                            MimeBodyPart attachmentPart = new MimeBodyPart();
-                            attachmentPart.setDataHandler(new DataHandler(dataSource));
-                            attachmentPart.setFileName(fileName != null ? fileName : "attachment");
-                            multipart.addBodyPart(attachmentPart);
+                            if (base64Data != null && !base64Data.isBlank()) {
+                                byte[] fileBytes = Base64.getDecoder().decode(base64Data);
+                                ByteArrayDataSource dataSource = new ByteArrayDataSource(fileBytes, contentType);
+                                MimeBodyPart attachmentPart = new MimeBodyPart();
+                                attachmentPart.setDataHandler(new DataHandler(dataSource));
+                                attachmentPart.setFileName(fileName != null ? fileName : "attachment");
+                                multipart.addBodyPart(attachmentPart);
+                            }
                         }
                     }
+                    message.setContent(multipart);
+                } else {
+                    message.setText(body);
                 }
-                message.setContent(multipart);
             } else {
                 message.setText(body);
             }
