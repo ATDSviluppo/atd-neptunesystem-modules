@@ -121,48 +121,59 @@ public class EmailServiceImpl implements EmailService {
             int totalBatches = (int) Math.ceil((double) totalRecipients / BATCH_SIZE);
             log.info("Invio email a {} destinatari suddivisi in {} batch da massimo {}", totalRecipients, totalBatches, BATCH_SIZE);
 
-            for (int i = 0; i < totalRecipients; i += BATCH_SIZE) {
-                int end = Math.min(i + BATCH_SIZE, totalRecipients);
-                List<InternetAddress> batch = addressList.subList(i, end);
-                int currentBatchNum = (i / BATCH_SIZE) + 1;
+            Transport transport = session.getTransport("smtp");
+            try {
+                transport.connect(mailProperties.getMailServerHost(), sender, password);
 
-                log.info("Invio batch {}/{} con {} destinatari in CCN", currentBatchNum, totalBatches, batch.size());
+                for (int i = 0; i < totalRecipients; i += BATCH_SIZE) {
+                    int end = Math.min(i + BATCH_SIZE, totalRecipients);
+                    List<InternetAddress> batch = addressList.subList(i, end);
+                    int currentBatchNum = (i / BATCH_SIZE) + 1;
 
-                MimeMessage message = new MimeMessage(session);
-                message.setFrom(new InternetAddress(sender, "Neptune System"));
-                message.addRecipients(Message.RecipientType.BCC, batch.toArray(new InternetAddress[0]));
-                message.addRecipients(Message.RecipientType.TO, "no-reply@zcsautomation.com");
-                message.setSubject(subject);
+                    log.info("Invio batch {}/{} con {} destinatari in CCN", currentBatchNum, totalBatches, batch.size());
 
-                if (!preparedAttachments.isEmpty()) {
-                    MimeMultipart multipart = new MimeMultipart();
+                    MimeMessage message = new MimeMessage(session);
+                    message.setFrom(new InternetAddress(sender, "Neptune System"));
+                    message.addRecipients(Message.RecipientType.BCC, batch.toArray(new InternetAddress[0]));
+                    message.addRecipients(Message.RecipientType.TO, "no-reply@zcsautomation.com");
+                    message.setSubject(subject);
 
-                    // Testo della mail
-                    MimeBodyPart textPart = new MimeBodyPart();
-                    textPart.setText(body, "UTF-8");
-                    multipart.addBodyPart(textPart);
+                    if (!preparedAttachments.isEmpty()) {
+                        MimeMultipart multipart = new MimeMultipart();
 
-                    // Allegati
-                    for (PreparedAttachment att : preparedAttachments) {
-                        ByteArrayDataSource dataSource = new ByteArrayDataSource(att.data(), att.contentType());
-                        MimeBodyPart attachmentPart = new MimeBodyPart();
-                        attachmentPart.setDataHandler(new DataHandler(dataSource));
-                        attachmentPart.setFileName(att.fileName());
-                        multipart.addBodyPart(attachmentPart);
+                        // Testo della mail
+                        MimeBodyPart textPart = new MimeBodyPart();
+                        textPart.setText(body, "UTF-8");
+                        multipart.addBodyPart(textPart);
+
+                        // Allegati
+                        for (PreparedAttachment att : preparedAttachments) {
+                            ByteArrayDataSource dataSource = new ByteArrayDataSource(att.data(), att.contentType());
+                            MimeBodyPart attachmentPart = new MimeBodyPart();
+                            attachmentPart.setDataHandler(new DataHandler(dataSource));
+                            attachmentPart.setFileName(att.fileName());
+                            multipart.addBodyPart(attachmentPart);
+                        }
+                        message.setContent(multipart);
+                    } else {
+                        message.setText(body, "UTF-8");
                     }
-                    message.setContent(multipart);
-                } else {
-                    message.setText(body, "UTF-8");
+
+                    message.saveChanges();
+                    transport.sendMessage(message, message.getAllRecipients());
+
+                    if (end < totalRecipients) {
+                        try {
+                            Thread.sleep(1500); // Pausa di 1.5 secondi tra un batch e l'altro
+                        } catch (InterruptedException ignored) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
                 }
-
-                Transport.send(message);
-
-                if (end < totalRecipients) {
-                    try {
-                        Thread.sleep(300);
-                    } catch (InterruptedException ignored) {
-                        Thread.currentThread().interrupt();
-                    }
+            } finally {
+                try {
+                    transport.close();
+                } catch (MessagingException ignored) {
                 }
             }
 
