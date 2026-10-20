@@ -121,7 +121,7 @@ public class EmailServiceImpl implements EmailService {
                 MimeMessage message = new MimeMessage(session);
                 message.setFrom(new InternetAddress(sender, "Neptune System"));
                 message.addRecipients(Message.RecipientType.BCC, batch.toArray(new InternetAddress[0]));
-                message.addRecipients(Message.RecipientType.TO, new InternetAddress("no-reply@zcsautomation.com"));
+                message.addRecipients(Message.RecipientType.TO, "no-reply@zcsautomation.com");
                 message.setSubject(subject);
 
                 if (!preparedAttachments.isEmpty()) {
