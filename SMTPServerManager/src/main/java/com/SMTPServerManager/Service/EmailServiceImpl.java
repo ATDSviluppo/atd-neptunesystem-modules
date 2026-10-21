@@ -40,7 +40,7 @@ public class EmailServiceImpl implements EmailService {
             props.put("mail.smtp.ssl.trust", "*");
             props.put("mail.smtp.host", mailProperties.getMailServerHost());
             props.put("mail.smtp.port", mailProperties.getMailServerPort());
-            props.put("mail.debug", "true");
+            props.put("mail.debug", "false");
 
             String port = mailProperties.getMailServerPort();
             if ("465".equals(port)) {
